@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Public board content. Any signed-in user may read the board; only the
+    // signed-in author of a message may create/update/delete it, and every
+    // write is checked against request.auth.uid — the UI hiding buttons is
+    // not the authorization layer, these rules are.
+    match /messages/{msgId} {
+      allow read: if request.auth != null;
+
+      allow create: if request.auth != null
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorName is string
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 1000
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if request.auth != null
+        && resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorUid == resource.data.authorUid
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 1000;
+
+      allow delete: if request.auth != null
+        && resource.data.authorUid == request.auth.uid;
+    }
+
+    // Private per-user record. Only the owner (uid in the path) can read or
+    // write their own document.
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Private opt-in notification preferences, reserved for the future
+    // Notifier feature. Never readable by other users.
+    match /users/{uid}/prefs/notifications {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
