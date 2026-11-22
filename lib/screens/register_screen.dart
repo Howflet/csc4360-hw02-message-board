@@ -72,7 +72,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         lastName: lastName,
         role: _role,
       );
-      // Success: AuthGate routes the new user to the board automatically.
+      // Success: pop the register screen so the auth gate (which has already
+      // swapped to the board via authStateChanges) is revealed.
+      if (mounted) Navigator.of(context).pop();
     } catch (e) {
       if (accountCreated) {
         // Roll back the half-finished account so a retry starts clean.
