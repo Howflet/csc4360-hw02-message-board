@@ -1,0 +1,14 @@
+{
+  "name": "message-board-rules-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automated Cloud Firestore security-rules tests for the HW-02 message board.",
+  "scripts": {
+    "test": "mocha --timeout 20000 \"test/**/*.test.js\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.0",
+    "firebase": "^11.4.0",
+    "mocha": "^11.1.0"
+  }
+}
